@@ -1,0 +1,6 @@
+name: MegaMiner
+version: '${project.version}'
+main: me.jetby.megaminer.MegaMiner
+api-version: '1.16'
+commands:
+  megaminer: {}
