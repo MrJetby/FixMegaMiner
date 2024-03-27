@@ -12,6 +12,7 @@ Blocks:
     Disabled-Enchantments:
       - silk_touch
     Messages:
+      Title: ";&c"
       Actionbar: '&c&l> &fYou broke a block and got &c+%money%'
       Message:
         - ' '

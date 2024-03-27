@@ -43,6 +43,8 @@ public class BlockBreak implements Listener {
         List<String> disabledworlds = blockscfg.getStringList(blockName + ".Disabled-Worlds");
         List<String> disabledenchantments = blockscfg.getStringList(blockName + ".Disabled-Enchantments");
         String actionbar = blockscfg.getString(blockName + ".Messages.Actionbar");
+        String title = blockscfg.getString(blockName + ".Messages.Title");
+
 
         World world = p.getWorld();
 
@@ -79,6 +81,12 @@ public class BlockBreak implements Listener {
                                     p.sendMessage(ps(p, newmessages));
                                 }
                             }
+                        if (!(title.isEmpty())) {
+                                String newmessages = title
+                                        .replace("%money%", String.valueOf(sum));
+                                String[] arg = newmessages.split(";");
+                                p.sendTitle(ps(p, arg[0]), ps(p, arg[1]));
+                        }
 
                             if (!(actionbar.isEmpty())) {
                                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
