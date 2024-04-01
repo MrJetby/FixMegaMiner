@@ -33,10 +33,12 @@ public class BlockBreak implements Listener {
         blockscfg = settings.getConfigurationSection("Blocks");
         Block block = e.getBlock();
         String blockName = block.getType().name();
+
         Player p = e.getPlayer();
 
-        int Min = blockscfg.getInt(blockName + ".Money.Min");
-        int Max = blockscfg.getInt(blockName + ".Money.Max");
+
+        double Min = blockscfg.getInt(blockName + ".Money.Min");
+        double Max = blockscfg.getInt(blockName + ".Money.Max");
         int Chance = blockscfg.getInt(blockName + ".Chance");
         List<String> commands = blockscfg.getStringList(blockName + ".Commands");
         List<String> message = blockscfg.getStringList(blockName + ".Messages.Message");
@@ -63,7 +65,7 @@ public class BlockBreak implements Listener {
 
                     if (Math.random() * 100 < Chance) {
 
-                        int sum = new Random().nextInt(Max - Min + 1) + Min;
+                        double sum = new Random().nextDouble(Max - Min + 1) + Min;
                         eco.depositPlayer(p, sum);
 
                             if (!(commands.isEmpty())) {
