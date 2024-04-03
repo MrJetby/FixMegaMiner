@@ -9,5 +9,8 @@
         <module name="MegaMiner" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="TreexTNT" target="9" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -24,14 +24,14 @@ Blocks:
     Commands:
       - give %player% gold_ingot
     Money:
-      Min: 10
-      Max: 25
+      Min: 10.0
+      Max: 25.0
 
   DIAMOND_ORE:
     Chance: 100
     Money:
-      Min: 10
-      Max: 25
+      Min: 10.0
+      Max: 25.0
     Messages:
       Actionbar: '&b&l> &fYou broke a block and got &b+%money%'
       Message:

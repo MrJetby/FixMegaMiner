@@ -1,13 +1,11 @@
 package me.jetby.megaminer.Listeners;
 
-import com.sun.org.apache.xerces.internal.xs.StringList;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,8 +14,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import static me.jetby.megaminer.MegaMiner.*;
@@ -64,28 +63,30 @@ public class BlockBreak implements Listener {
                         }
 
                     if (Math.random() * 100 < Chance) {
-
                         double sum = new Random().nextDouble(Max - Min + 1) + Min;
-                        eco.depositPlayer(p, sum);
+                        BigDecimal result = new BigDecimal(sum);
+                        result = result.setScale(3, RoundingMode.DOWN);
+
+                        eco.depositPlayer(p, result.floatValue());
 
                             if (!(commands.isEmpty())) {
                                 for (String cmds : commands) {
                                     String newcmds = cmds
                                             .replace("%player%", p.getName())
-                                            .replace("%money%", String.valueOf(sum));
+                                            .replace("%money%", String.valueOf(result));
                                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), ps(p, newcmds));
                                 }
                             }
                             if (!(message.isEmpty())) {
                                 for (String messages : message) {
                                     String newmessages = messages
-                                            .replace("%money%", String.valueOf(sum));
+                                            .replace("%money%", String.valueOf(result));
                                     p.sendMessage(ps(p, newmessages));
                                 }
                             }
                         if (!(title.isEmpty())) {
                                 String newmessages = title
-                                        .replace("%money%", String.valueOf(sum));
+                                        .replace("%money%", String.valueOf(result));
                                 String[] arg = newmessages.split(";");
                                 p.sendTitle(ps(p, arg[0]), ps(p, arg[1]));
                         }
@@ -93,7 +94,7 @@ public class BlockBreak implements Listener {
                             if (!(actionbar.isEmpty())) {
                                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
                                         ps(p, actionbar
-                                                .replace("%money%", String.valueOf(sum)))));
+                                                .replace("%money%", String.valueOf(result)))));
                             }
                     }
                 }
