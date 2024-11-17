@@ -1,0 +1,43 @@
+# В Actions доступны
+# [PLAYER] cmd
+# [CONSOLE] cmd
+# [SOUND] ITEM_TRIDENT_THUNDER -volume:1.0f -pitch:1.0f
+# [EFFECT] BLINDNESS -duration:1 -strength:0
+# [TITLE] Title;Subtitle -fadeIn:1 -stay:3 -fadeOut:1
+# [MESSAGE] Сообщение
+# [ACTIONBAR] Текст
+#
+
+messages:
+  reload: "&e&lMegaMiner &7→ &aПлагин перезагружен."
+  noperm: "&e&lMegaMiner &7→ &cНедостаточно прав!" # permission: megaminer.admin
+
+Blocks:
+  STONE:
+    Chance: 100
+    # Вы можете удалить какую то категорию если не используете
+    Disabled-Worlds:
+      - disabled-world1
+      - disabled-world2
+    Disabled-Enchantments:
+      - silk_touch
+      - sharpness
+    Actions:
+      - '[GIVEMONEY] 10-25' # Выдача случайного количество монет от 10 до 25
+      - '[ACTIONBAR] &c&l> &fВы заработали &c$%money% за добычу блока.'
+      - '[MESSAGE] '
+      - '[MESSAGE] &c&l⌈'
+      - '[MESSAGE] &c| &fБаланс пополнен на сумму &c$%money%'
+      - '[MESSAGE] &c| &fПотому что вы сломали блок.'
+      - '[MESSAGE] &c&l⌊'
+      - '[MESSAGE] '
+
+  DIAMOND_ORE:
+    Chance: 100
+    Money:
+      Min: 10
+      Max: 25
+    Messages:
+      Actionbar: '&b&l> &fВы заработали &c$%money% за добычу блока.'
+
+# и другие...

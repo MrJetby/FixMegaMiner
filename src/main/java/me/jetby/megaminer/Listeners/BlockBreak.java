@@ -14,90 +14,84 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Random;
 
 import static me.jetby.megaminer.MegaMiner.*;
-import static me.jetby.megaminer.Utils.PS.ps;
+import static me.jetby.megaminer.Utils.Actions.*;
+
 
 public class BlockBreak implements Listener {
 
-    private ConfigurationSection blockscfg;
+    private ConfigurationSection blocks = cfg.getConfigurationSection("Blocks");
+    private List<String> DisabledWorlds;
+    private List<String> DisabledEnchantments;
+
 
     @EventHandler
     public void OnBlockBreak(BlockBreakEvent e) {
 
-        blockscfg = settings.getConfigurationSection("Blocks");
         Block block = e.getBlock();
         String blockName = block.getType().name();
 
         Player p = e.getPlayer();
 
-
-        double Min = blockscfg.getInt(blockName + ".Money.Min");
-        double Max = blockscfg.getInt(blockName + ".Money.Max");
-        int Chance = blockscfg.getInt(blockName + ".Chance");
-        List<String> commands = blockscfg.getStringList(blockName + ".Commands");
-        List<String> message = blockscfg.getStringList(blockName + ".Messages.Message");
-        List<String> disabledworlds = blockscfg.getStringList(blockName + ".Disabled-Worlds");
-        List<String> disabledenchantments = blockscfg.getStringList(blockName + ".Disabled-Enchantments");
-        String actionbar = blockscfg.getString(blockName + ".Messages.Actionbar");
-        String title = blockscfg.getString(blockName + ".Messages.Title");
+        DisabledWorlds = blocks.getStringList(blockName + ".Disabled-Worlds");
+        DisabledEnchantments = blocks.getStringList(blockName + ".Disabled-Enchantments");
 
 
         World world = p.getWorld();
 
-            if (blockscfg.contains(blockName)) {
-                if (!(disabledworlds.contains(world.getName()))) {
+            if (blocks.contains(blockName)) {
+                if (!(DisabledWorlds.contains(world.getName()))) {
                         ItemStack itemInHand = p.getInventory().getItemInMainHand();
+                        if (itemInHand==null) {return;}
                         ItemMeta itemMeta = itemInHand.getItemMeta();
+
                         if (itemMeta != null && itemMeta.hasEnchants()) {
                             for (Enchantment enchantment : itemMeta.getEnchants().keySet()) {
-                                // Проверяем, есть ли запрещенное зачарование на предмете в руках
-                                if (disabledenchantments.contains(enchantment.getKey().getKey())) {
-                                    return; // Просто завершаем метод, не делая ничего
+                                // есть ли запрещенное зачарование на предмете в руках
+                                if (DisabledEnchantments.contains(enchantment.getKey().getKey())) {
+                                    return;
                                 }
                             }
                         }
 
-                    if (Math.random() * 100 < Chance) {
-                        double sum = new Random().nextDouble(Max - Min + 1) + Min;
-                        BigDecimal result = new BigDecimal(sum);
-                        result = result.setScale(3, RoundingMode.DOWN);
-
-                        eco.depositPlayer(p, result.floatValue());
-
-                            if (!(commands.isEmpty())) {
-                                for (String cmds : commands) {
-                                    String newcmds = cmds
-                                            .replace("%player%", p.getName())
-                                            .replace("%money%", String.valueOf(result));
-                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), ps(p, newcmds));
-                                }
-                            }
-                            if (!(message.isEmpty())) {
-                                for (String messages : message) {
-                                    String newmessages = messages
-                                            .replace("%money%", String.valueOf(result));
-                                    p.sendMessage(ps(p, newmessages));
-                                }
-                            }
-                        if (!(title.isEmpty())) {
-                                String newmessages = title
-                                        .replace("%money%", String.valueOf(result));
-                                String[] arg = newmessages.split(";");
-                                p.sendTitle(ps(p, arg[0]), ps(p, arg[1]));
-                        }
-
-                            if (!(actionbar.isEmpty())) {
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
-                                        ps(p, actionbar
-                                                .replace("%money%", String.valueOf(result)))));
-                            }
+                    if (activeTimers.containsKey(p)) {
+                        cancelTimer(e.getPlayer());
                     }
+                    int Chance = cfg.getInt("Blocks." + blockName + ".Chance", -1);
+
+                    if (new Random().nextInt(100) > Chance) {
+                        // Событие не сработало
+                        return;
+                    }
+
+                    List<String> actions = blocks.getStringList(blockName + ".Actions");
+                    for (String action : actions) {
+                        Actions(p, action);
+                    }
+
                 }
             }
+    }private static void cancelTimer(Player player) {
+        if (activeTimers.containsKey(player)) {
+            activeTimers.get(player).cancel();
+            activeTimers.remove(player);
+
+            if (playerBossBars.containsKey(player)) {
+                playerBossBars.get(player).removeAll();
+                playerBossBars.remove(player);
+            }
+
+            playerCountdowns.remove(player);
+
+            // Получаем действия из конфига и выполняем их
+            List<String> actions = cfg.getStringList("actions.cancel");
+            for (String action : actions) {
+                Actions(player, action);
+            }
+
+        }
     }
 }
